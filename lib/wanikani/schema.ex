@@ -2,7 +2,7 @@ defmodule WaniKani.Schema do
   use Absinthe.Schema
   import Absinthe.Resolution.Helpers
 
-  import_types(Absinthe.Type.Custom)
+  import_types(WaniKani.Schema.Scalars)
 
   object :assignment do
     field(:id, :id)
@@ -15,20 +15,13 @@ defmodule WaniKani.Schema do
     field(:subject, :subject, resolve: dataloader(:subject))
     field(:subject_type, :string)
 
-    # todo - datetime
-    field(:started_at, :string)
-    # todo - datetime
-    field(:available_at, :string)
-    # todo - datetime
-    field(:burned_at, :string)
-    # todo - datetime
-    field(:created_at, :string)
-    # todo - datetime
-    field(:passed_at, :string)
-    # todo - datetime
-    field(:resurrected_at, :string)
-    # todo - datetime
-    field(:unlocked_at, :string)
+    field(:started_at, :datetime)
+    field(:available_at, :datetime)
+    field(:burned_at, :datetime)
+    field(:created_at, :datetime)
+    field(:passed_at, :datetime)
+    field(:resurrected_at, :datetime)
+    field(:unlocked_at, :datetime)
   end
 
   object :level_progression do
@@ -36,28 +29,20 @@ defmodule WaniKani.Schema do
     field(:url, :string)
 
     field(:level, :integer)
-    # todo - datetime
-    field(:abandoned_at, :string)
-    # todo - datetime
-    field(:completed_at, :string)
-    # todo - datetime
-    field(:created_at, :string)
-    # todo - datetime
-    field(:passed_at, :string)
-    # todo - datetime
-    field(:started_at, :string)
-    # todo - datetime
-    field(:unlocked_at_at, :string)
+    field(:abandoned_at, :datetime)
+    field(:completed_at, :datetime)
+    field(:created_at, :datetime)
+    field(:passed_at, :datetime)
+    field(:started_at, :datetime)
+    field(:unlocked_at_at, :datetime)
   end
 
   object :reset do
     field(:id, :id)
     field(:url, :string)
 
-    # todo - datetime
-    field(:created_at, :string)
-    # todo - datetime
-    field(:confirmed_at, :string)
+    field(:created_at, :datetime)
+    field(:confirmed_at, :datetime)
     field(:original_level, :integer)
     field(:target_level, :integer)
   end
@@ -66,8 +51,7 @@ defmodule WaniKani.Schema do
     field(:id, :id)
     field(:url, :string)
 
-    # todo - datetime
-    field(:created_at, :string)
+    field(:created_at, :datetime)
     field(:ending_srs_stage, :integer)
     field(:incorrect_meaning_answers, :integer)
     field(:incorrect_reading_answers, :integer)
@@ -80,14 +64,17 @@ defmodule WaniKani.Schema do
     field(:subject_id, :id)
 
     field(:spaced_repetition_system_id, :id)
+
+    field(:spaced_repetition_system, :spaced_repetition_system,
+      resolve: dataloader(:spaced_repetition_system)
+    )
   end
 
   object :review_statistic do
     field(:id, :id)
     field(:url, :string)
 
-    # todo - datetime
-    field(:created_at, :string)
+    field(:created_at, :datetime)
     field(:hidden, :boolean)
     field(:meaning_correct, :integer)
     field(:meaning_current_streak, :integer)
@@ -98,6 +85,8 @@ defmodule WaniKani.Schema do
     field(:reading_current_streak, :integer)
     field(:reading_incorrect, :integer)
     field(:reading_max_streak, :integer)
+
+    field(:subject, :subject, resolve: dataloader(:subject))
     field(:subject_id, :integer)
     field(:subject_type, :string)
   end
@@ -113,8 +102,7 @@ defmodule WaniKani.Schema do
     field(:url, :string)
 
     field(:burning_stage_position, :integer)
-    # todo - datetime
-    field(:created_at, :string)
+    field(:created_at, :datetime)
     field(:description, :string)
     field(:name, :string)
     field(:passing_stage_position, :integer)
@@ -147,6 +135,8 @@ defmodule WaniKani.Schema do
     field(:gender, :string)
     field(:source_id, :id)
     field(:pronunciation, :string)
+
+    field(:voice_actor, :voice_actor, resolve: dataloader(:voice_actor))
     field(:voice_actor_id, :id)
     field(:voice_actor_name, :string)
     field(:voice_description, :string)
@@ -179,16 +169,19 @@ defmodule WaniKani.Schema do
   object :subject do
     field(:auxiliary_meanings, list_of(:auxiliary_meaning))
     field(:characters, :string)
-    # todo - datetime
-    field(:created_at, :string)
+    field(:created_at, :datetime)
     field(:document_url, :string)
-    # todo - datetime
-    field(:hidden_at, :string)
+    field(:hidden_at, :datetime)
     field(:lesson_position, :integer)
     field(:level, :integer)
     field(:meaning_mneomic, :string)
     field(:meanings, list_of(:meaning))
     field(:slug, :string)
+
+    field(:spaced_repetition_system, :spaced_repetition_system,
+      resolve: dataloader(:spaced_repetition_system)
+    )
+
     field(:spaced_repetition_system_id, :id)
 
     # radicals
@@ -213,8 +206,7 @@ defmodule WaniKani.Schema do
     field(:id, :id)
     field(:url, :string)
 
-    # todo - datetime
-    field(:created_at, :string)
+    field(:created_at, :datetime)
     field(:hidden, :boolean)
     field(:meaning_note, :string)
     field(:meaning_synonyms, list_of(:string))
@@ -226,15 +218,12 @@ defmodule WaniKani.Schema do
   end
 
   object :lesson do
-    # todo - datetime
-    field(:available_at, :string)
+    field(:available_at, :datetime)
     field(:subject_ids, list_of(:id))
-    field(:subjects, list_of(:subject), resolve: dataloader(:subject))
   end
 
   object :summary_review do
-    # todo - datetime
-    field(:available_at, :string)
+    field(:available_at, :datetime)
     field(:subject_ids, list_of(:id))
     field(:subjects, list_of(:subject), resolve: dataloader(:subject))
   end
@@ -243,9 +232,8 @@ defmodule WaniKani.Schema do
     field(:url, :string)
 
     field(:lessons, list_of(:lesson))
-    # todo - datetime
-    field(:next_reviews_at, :string)
-    field(:reviews, list_of(:review))
+    field(:next_reviews_at, :datetime)
+    field(:reviews, list_of(:summary_review))
   end
 
   object :user_preferences do
@@ -260,8 +248,7 @@ defmodule WaniKani.Schema do
   object :user_subscription do
     field(:active, :boolean)
     field(:max_level_granted, :integer)
-    # todo - datetime
-    field(:period_ends_at, :string)
+    field(:period_ends_at, :datetime)
     field(:type, :string)
   end
 
@@ -269,13 +256,11 @@ defmodule WaniKani.Schema do
     field(:id, :id)
     field(:url, :string)
 
-    # todo - datetime
-    field(:current_vacation_started_at, :string)
+    field(:current_vacation_started_at, :datetime)
     field(:level, :integer)
     field(:preferences, :user_preferences)
     field(:profile_url, :string)
-    # todo - datetime
-    field(:started_at, :string)
+    field(:started_at, :datetime)
     field(:subscription, :user_subscription)
     field(:username, :string)
   end
