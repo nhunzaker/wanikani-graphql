@@ -1,0 +1,1 @@
+config :wanikani, :api_token, "<ENTER-HERE>"
