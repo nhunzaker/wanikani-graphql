@@ -7,6 +7,14 @@ defmodule WaniKani.Resource do
     Application.fetch_env!(:wanikani, :api_token)
   end
 
+  def api_version do
+    Application.fetch_env!(:wanikani, :api_version)
+  end
+
+  def api_revision do
+    Application.fetch_env!(:wanikani, :api_revision)
+  end
+
   def map_records(json) do
     Enum.map(json.data, fn entry ->
       entry.data
@@ -38,14 +46,14 @@ defmodule WaniKani.Resource do
   end
 
   def headers() do
-    [{"Authorization", "Bearer #{api_token()}"}]
+    [{"Authorization", "Bearer #{api_token()}"}, {"Wanikani-Revision", api_revision()}]
   end
 
   def uri(path, query \\ %{}) do
     uri = %URI{
       scheme: "https",
       host: api_host(),
-      path: "/v2/#{path}",
+      path: "/#{api_version()}/#{path}",
       query: Plug.Conn.Query.encode(query)
     }
 
