@@ -1,22 +1,21 @@
 # WaniKani GraphQL
 
-This repo provides a crude GraphQL interface over the WaniKani API.
+This repo provides a crude GraphQL interface over the WaniKani API. When possible, it batches requests to mitigate API usage.
 
-**TODO: Add description**
+## Setup Instructions
 
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `wanikani` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:wanikani, "~> 0.1.0"}
-  ]
-end
+```
+cp ./config/dev.exs.example ./config/dev.exs
+# update config/dev.exs with your API Version 2 token
+iex -S mix
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/wanikani](https://hexdocs.pm/wanikani).
+You can visit the GraphiQL explorer at `http://localhost:4000/graphiql`.
+
+## What's missing (todo)
+
+- [ ] Pagination on subjects
+- [ ] Additional endpoint query parameters
+- [ ] A handful of subresources
+- [ ] Union between subjects (Radical, Kanji, Vocab)
+- [ ] Caching
