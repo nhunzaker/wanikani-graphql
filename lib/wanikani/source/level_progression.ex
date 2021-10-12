@@ -1,40 +1,27 @@
 defmodule WaniKani.Source.LevelProgression do
+  use WaniKani.Source
+
   alias WaniKani.Resource
 
-  require Logger
-
-  def data() do
-    Dataloader.KV.new(&fetch/2)
-  end
+  @resource "level_progressions"
 
   def fetch({:level_progression, %{id: id}}, _args) do
-    {:ok, record} = Resource.one("level_progressions/#{id}")
+    {:ok, record} = Resource.one("#{@resource}/#{id}")
     %{%{} => record}
   end
 
-  def fetch({:level_progressions, %{}}, _) do
-    {:ok, records} = Resource.all(:level_progressions)
-    %{%{} => records}
+  def fetch({:level_progressions, params}, _) do
+    {:ok, records} = Resource.request(@resource, params)
+    %{%{} => Resource.map_records(records)}
   end
 
   def fetch(_batch, args) do
-    ids = Enum.map(args, & &1[:level_progression_id])
-    subjects = batch_request(ids)
-    Enum.zip(args, subjects)
-  end
+    ids =
+      Enum.map(args, & &1[:level_progression_id])
+      |> Enum.join(",")
 
-  def batch_request(ids) do
-    headers = Resource.headers()
-    uri = Resource.uri("level_progressions", %{ids: Enum.join(ids, ",")})
+    records = batch_request(@resource, %{ids: ids})
 
-    Logger.debug("API Request: #{uri}")
-
-    {:ok, res} =
-      Finch.build(:get, uri, headers)
-      |> Finch.request(WaniKaniFinch)
-
-    {:ok, json} = Jason.decode(res.body, keys: :atoms)
-
-    Resource.map_records(json)
+    zip_batch(args, records)
   end
 end

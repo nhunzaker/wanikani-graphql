@@ -1,40 +1,27 @@
 defmodule WaniKani.Source.VoiceActor do
+  use WaniKani.Source
+
   alias WaniKani.Resource
 
-  require Logger
-
-  def data() do
-    Dataloader.KV.new(&fetch/2)
-  end
+  @resource "voice_actor"
 
   def fetch({:voice_actor, %{id: id}}, _args) do
-    {:ok, record} = Resource.one("voice_actors/#{id}")
+    {:ok, record} = Resource.one("#{@resource}/#{id}")
     %{%{} => record}
   end
 
-  def fetch({:voice_actors, %{}}, _) do
-    {:ok, records} = Resource.all(:voice_actors)
-    %{%{} => records}
+  def fetch({:voice_actors, params}, _) do
+    {:ok, records} = Resource.request(@resource, params)
+    %{%{} => Resource.map_records(records)}
   end
 
   def fetch(_batch, args) do
-    ids = Enum.map(args, & &1[:voice_actor_id])
-    voice_actors = batch_request(ids)
-    Enum.zip(args, voice_actors)
-  end
+    ids =
+      Enum.map(args, & &1[:voice_actor_id])
+      |> Enum.join(",")
 
-  def batch_request(ids) do
-    headers = Resource.headers()
-    uri = Resource.uri("voice_actors", %{ids: Enum.join(ids, ",")})
+    records = batch_request(@resource, %{ids: ids})
 
-    Logger.debug("API Request: #{uri}")
-
-    {:ok, res} =
-      Finch.build(:get, uri, headers)
-      |> Finch.request(WanikaniFinch)
-
-    {:ok, json} = Jason.decode(res.body, keys: :atoms)
-
-    Resource.map_records(json)
+    zip_batch(args, records)
   end
 end

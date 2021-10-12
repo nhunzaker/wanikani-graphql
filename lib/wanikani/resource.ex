@@ -1,4 +1,6 @@
 defmodule WaniKani.Resource do
+  require Logger
+
   def api_host do
     Application.fetch_env!(:wanikani, :api_host)
   end
@@ -60,10 +62,14 @@ defmodule WaniKani.Resource do
     URI.to_string(uri)
   end
 
-  defp request(resource_type) do
+  def request(resource_type, query \\ %{}) do
+    uri = uri(resource_type, query)
+
     {:ok, res} =
-      Finch.build(:get, uri(resource_type), headers())
+      Finch.build(:get, uri, headers())
       |> Finch.request(WaniKaniFinch)
+
+    Logger.debug("Sending request: #{uri}")
 
     Jason.decode(res.body, keys: :atoms)
   end

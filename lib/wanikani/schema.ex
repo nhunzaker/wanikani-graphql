@@ -280,7 +280,25 @@ defmodule WaniKani.Schema do
       arg(:id, non_null(:id))
     end
 
-    field(:assignments, list_of(:assignment), resolve: dataloader(:assignment))
+    field(:assignments, list_of(:assignment)) do
+      arg(:available_after, :datetime)
+      arg(:available_before, :datetime)
+      arg(:burned, :boolean)
+      arg(:hidden, :boolean)
+      arg(:ids, list_of(:id))
+      arg(:immediately_available_for_lessons, :boolean)
+      arg(:immediately_available_for_review, :boolean)
+      arg(:in_review, :boolean)
+      arg(:levels, list_of(:integer))
+      arg(:srs_stages, list_of(:integers))
+      arg(:started, :boolean)
+      arg(:subject_ids, list_of(:id))
+      arg(:subject_types, list_of(:string))
+      arg(:unlocked, :boolean)
+      arg(:updated_after, :datetime)
+
+      resolve(dataloader(:assignment))
+    end
 
     # LEVEL PROGRESSION
 
@@ -288,13 +306,21 @@ defmodule WaniKani.Schema do
       arg(:id, non_null(:id))
     end
 
-    field(:level_progressions, list_of(:level_progression),
-      resolve: dataloader(:level_progression)
-    )
+    field(:level_progressions, list_of(:level_progression)) do
+      arg(:ids, list_of(:id))
+      arg(:updated_after, :datetime)
+
+      resolve(dataloader(:level_progression))
+    end
 
     # RESETS
 
-    field(:resets, list_of(:reset), resolve: dataloader(:reset))
+    field(:resets, list_of(:reset)) do
+      arg(:ids, list_of(:id))
+      arg(:updated_after, :datetime)
+
+      resolve(dataloader(:reset))
+    end
 
     field :reset, :reset, resolve: dataloader(:reset) do
       arg(:id, non_null(:id))
@@ -302,7 +328,14 @@ defmodule WaniKani.Schema do
 
     # REVIEWS
 
-    field(:reviews, list_of(:review), resolve: dataloader(:review))
+    field(:reviews, list_of(:review)) do
+      arg(:ids, list_of(:id))
+      arg(:assignment_ids, list_of(:id))
+      arg(:subject_ids, list_of(:id))
+      arg(:updated_after, :datetime)
+
+      resolve(dataloader(:review))
+    end
 
     field :review, :review, resolve: dataloader(:review) do
       arg(:id, non_null(:id))
@@ -310,7 +343,17 @@ defmodule WaniKani.Schema do
 
     # REVIEW STATISTICS
 
-    field(:review_statistics, list_of(:review_statistic), resolve: dataloader(:review_statistic))
+    field(:review_statistics, list_of(:review_statistic)) do
+      arg(:hidden, :boolean)
+      arg(:ids, list_of(:id))
+      arg(:percentages_greater_than, :integer)
+      arg(:percentages_less_than, :integer)
+      arg(:subject_ids, list_of(:id))
+      arg(:subject_types, list_of(:string))
+      arg(:updated_after, :datetime)
+
+      resolve(dataloader(:review_statistic))
+    end
 
     field :review_statistic, :review_statistic, resolve: dataloader(:review_statistic) do
       arg(:id, non_null(:id))
@@ -318,18 +361,29 @@ defmodule WaniKani.Schema do
 
     # SPACED REPETITION
 
-    field(:spaced_repetition_systems, list_of(:spaced_repetition_system),
-      resolve: dataloader(:spaced_repetition_system)
-    )
+    field(:spaced_repetition_systems, list_of(:spaced_repetition_system)) do
+      arg(:ids, list_of(:id))
+      arg(:updated_after, :datetime)
 
-    field :spaced_repetition_system, :spaced_repetition_system,
-      resolve: dataloader(:spaced_repetition_system) do
+      resolve(dataloader(:spaced_repetition_system))
+    end
+
+    field :spaced_repetition_system, :spaced_repetition_system do
       arg(:id, non_null(:id))
+      resolve(dataloader(:spaced_repetition_system))
     end
 
     # STUDY MATERIALS
 
-    field(:study_materials, list_of(:study_material), resolve: dataloader(:study_material))
+    field(:study_materials, list_of(:study_material)) do
+      arg(:hidden, :boolean)
+      arg(:ids, list_of(:id))
+      arg(:subject_ids, list_of(:id))
+      arg(:subject_types, list_of(:string))
+      arg(:updated_after, :datetime)
+
+      resolve(dataloader(:study_material))
+    end
 
     field :study_material, :study_material, resolve: dataloader(:study_material) do
       arg(:id, non_null(:id))
@@ -345,17 +399,28 @@ defmodule WaniKani.Schema do
 
     # VOICE ACTORS
 
-    field(:voice_actors, list_of(:voice_actor), resolve: dataloader(:voice_actor))
+    field(:voice_actors, list_of(:voice_actor)) do
+      arg(:ids, list_of(:id))
+      arg(:updated_after, :datetime)
+
+      resolve(dataloader(:voice_actor))
+    end
 
     field :voice_actor, :voice_actor, resolve: dataloader(:voice_actor) do
       arg(:id, non_null(:id))
     end
 
-    # TODO - Subjects
     # TODO - this is paginated
-    # TODO Query parameters
+    field(:subjects, list_of(:subject)) do
+      arg(:ids, list_of(:id))
+      arg(:types, list_of(:string))
+      arg(:slugs, list_of(:string))
+      arg(:levels, list_of(:integer))
+      arg(:hidden, :boolean)
+      arg(:updated_after, :datetime)
 
-    field(:subjects, list_of(:subject), resolve: dataloader(:subject))
+      resolve(dataloader(:subject))
+    end
 
     field :subject, :subject, resolve: dataloader(:subject) do
       arg(:id, non_null(:id))

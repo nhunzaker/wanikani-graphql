@@ -1,40 +1,27 @@
 defmodule WaniKani.Source.SpacedRepetitionSystem do
+  use WaniKani.Source
+
   alias WaniKani.Resource
 
-  require Logger
-
-  def data() do
-    Dataloader.KV.new(&fetch/2)
-  end
+  @resource "spaced_repetition_system"
 
   def fetch({:spaced_repetition_system, %{id: id}}, _args) do
-    {:ok, record} = Resource.one("spaced_repetition_systems/#{id}")
+    {:ok, record} = Resource.one("#{@resource}/#{id}")
     %{%{} => record}
   end
 
-  def fetch({:spaced_repetition_systems, %{}}, _) do
-    {:ok, records} = Resource.all(:spaced_repetition_systems)
-    %{%{} => records}
+  def fetch({:spaced_repetition_systems, params}, _) do
+    {:ok, records} = Resource.request(@resource, params)
+    %{%{} => Resource.map_records(records)}
   end
 
   def fetch(_batch, args) do
-    ids = Enum.map(args, & &1[:spaced_repetition_system_id])
-    subjects = batch_request(ids)
-    Enum.zip(args, subjects)
-  end
+    ids =
+      Enum.map(args, & &1[:spaced_repetition_system_id])
+      |> Enum.join(",")
 
-  def batch_request(ids) do
-    headers = Resource.headers()
-    uri = Resource.uri("spaced_repetition_systems", %{ids: Enum.join(ids, ",")})
+    records = batch_request(@resource, %{ids: ids})
 
-    Logger.debug("API Request: #{uri}")
-
-    {:ok, res} =
-      Finch.build(:get, uri, headers)
-      |> Finch.request(WaniKaniFinch)
-
-    {:ok, json} = Jason.decode(res.body, keys: :atoms)
-
-    Resource.map_records(json)
+    zip_batch(args, records)
   end
 end
